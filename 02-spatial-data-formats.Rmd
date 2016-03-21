@@ -7,7 +7,7 @@ authors: [Leah A. Wasser, Megan A. Jones]
 contributors: [ ]
 dateCreated: 2015-10-23
 lastModified: `r format(Sys.time(), "%Y-%m-%d")`
-packagesLibraries: [ ]
+packagesLibraries: [raster, rgdal, sp]
 category: [self-paced-tutorial] 
 tags: [R, spatial-data-gis]
 mainTag: spatial-data-management-series
@@ -16,7 +16,7 @@ description: "This tutorial covers the basics of key data formats that may
 contain spatial information including shapefile, GeoTIFF and .csv. It also
 provides a brief overview of other formats that you may encounter when working
 with spatial data."
-code1: 02-spatial-data-formats.R
+code1: /R/dc-spatio-temporal-intro/02-spatial-data-formats.R
 image:
   feature: NEONCarpentryHeader_2.png
   credit: A collaboration between the National Ecological Observatory Network (NEON) and Data Carpentry
@@ -31,9 +31,7 @@ This tutorial covers the basics of key data formats that may contain spatial
 information including shapefile, GeoTIFF and .csv. It also provides a brief 
 overview of other formats that you may encounter when working with spatial data.
 
-**R Skill Level:** None. This tutorial is in a series with data skills
-intensive tutorials in the `R` programming language, however, the conceptual
-topics presented here relate to all programming languages!
+**R Skill Level:** Beginner 
 
 <div id="objectives" markdown="1">
 
@@ -51,7 +49,11 @@ with shapefiles which contain multiple associated files.
 * Understand where metadata are often stored in both raster and vector data 
 formats.
 
-****
+### Install R Packages
+
+* **raster:** `install.packages("raster")`
+* **rgdal:** `install.packages("rgdal")`
+
 
 {% include/_greyBox-wd-rscript.html %}
 
@@ -66,18 +68,23 @@ GIS file formats.</a>
 </div>
 
 
-## Storing Spatial Data On Your Computer
+## Get Started With Your Project -  File Organization
 
-Sometimes it makes sense to store your data in a specific data directory 
-(folder) that you use for one particular project. However, when you work with
-spatial data on your computer, it is a good idea to store large data sets in a 
-general data directory that you can easily access for many different projects. 
-If you are working in a collaborative environment, use a shared data directory. 
+When we work with large, spatio-temporal data, it is a good idea to store large 
+data sets in a general data directory that you can easily access from many 
+projects. If you are working in a collaborative 
+environment, use a shared data directory. 
 
-<i class="fa fa-star"></i> **Data Note:** Wondering why we’re saying 
-**directory** instead of **folder**? See our discussion of 
-[Directory vs. Folder](http://neondataskills.org/R/Set-Working-Directory#directory-vs-folder).
-{: .notice}
+## One Dataset - Many Files
+
+While text files often are self contained (one CSV) is composed of one unique file,
+many spatial formats contain several files. For instance, a shapefile (discussed 
+below) contains 3 or more files, all of which must retain the same NAME and be
+stored in the same file directory, in order for you to be able to work with them.
+We will discuss these issues as they related to two key spatial data formats - 
+.shp (shapefile) which stores **vector** data and .tif (geotiff) which stores
+**raster** data in more detail, below. 
+
 
 ## Types of Spatial Data
 
@@ -128,8 +135,48 @@ include:
 type of vector data**: points, lines or polygons. 
 {: .notice}
 
+```{r import-vector, warning=FALSE}
+
+# load libraries required to work with spatial data
+library(raster) # commands to view metadata from vector objects
+library(rgdal) # library of common GIS functions
+
+# Open shapefile
+roads_HARV <- readOGR("NEON-DS-Site-Layout-Files/HARV","HARV_roads")
+
+# view slots available for the object
+slotNames(roads_HARV)
+
+# view all methods available for that object
+# methods(class = class(roads_HARV))
+
+```
+
+
+## Stucture of a Lines Feature 
+
+If we are working with a shapefile containing **line** data, then each line
+consists of 2 or more vertices that are connected. We can view each set of coordinates
+for that object using `R`.
+
+```{r view-lines-coordinates }
+
+# view the coordinates for each vertex, for the last feature in the spatial object
+roads_HARV@lines[13]
+
+# view the coordinates for the last feature in the spatial object
+roads_HARV@lines[14]
+
+```
+
+
+<div id="challenge" markdown="1">
+Question - Why didn't `roads_HARV@lines[14]` return any vertex coordinates?
+</div>
+
 ## Spatial Data Attributes
-Each object in a shapefile is called a `feature`. Each `feature` has one or 
+
+Each object in a shapefile, is called a `feature`. Each `feature` has one or 
 more `attributes` associated with it. 
 
 Shapefile attributes are similar to fields or columns in a spreadsheet. Each row
@@ -153,28 +200,40 @@ attributes stored with it.
     </figcaption>
 </figure>
 
-In this map of the Harvard Forest field site, there are many different features 
+
+```{r view-attributes }
+# view all attributes for a spatial object
+# note, the code below just looks at the first 3 features
+head(roads_HARV@data, 3)
+
+```
+
+In the map below of the Harvard Forest field site, there are many different features 
 with different spatial object types. We will learn to create maps like this in 
 the 
 [*Introduction to Working with Vector Data in R* tutorial series]({{ site.basurl }}/tutorial-series/vector-data-series/).
 
 <figure>
-    <a href="{{ site.baseurl }}/images/dc-spatio-temporal-intro/vector-data-map.png">
-    <img src="{{ site.baseurl }}/images/dc-spatio-temporal-intro/vector-data-map.png"></a>
-    <figcaption>The map above contains point and line format vector data. 
-    Source: National Ecological Observatory Network (NEON) 
+    <a href="{{ site.baseurl }}/images/dc-spatio-temporal-intro/plot-color.png">
+    <img src="{{ site.baseurl }}/images/dc-spatio-temporal-intro/plot-color.png"></a>
+    <figcaption>The map above contains point and line format vector data. We will
+    create a map like this in the vector data tutorial series.
+    Image Source: National Ecological Observatory Network (NEON) 
     </figcaption>
 </figure>
 
 <div id="challenge" markdown="1">
+
 ## Challenge: Shapefiles
 
-For the map **Study Plots by Soil Type**, what is the minimum number of 
-shapefiles that were required to create this map? How do you know? 
+Have a look at the map above:  **Study Plots by Soil Type**. What is the minimum number of 
+shapefiles that are required to create this map? How do you know? 
 
 </div>
 
-```{r challenge-code-shapefile, echo=FALSE}
+
+```{r challenge-code-shapefiles, echo=FALSE}
+
 
 # Two. There are both points (study plots labelled in legend by the soil type) 
 # and lines (the boardwalk, footpath, stone walls, and woods road in legend) in
@@ -185,16 +244,18 @@ shapefiles that were required to create this map? How do you know?
 ```
 
 
+
 ### Shapefile Structure
 
 When working with shapefiles, it is important to remember that a shapefile
-actually consists of a mandatory of 3 (or more) files:
+ consists of 3 (or more) files:
 
-* `.shp`: the file that contains the geometry for all features.
-* `.shx`: the file that indexs the geometry.
-* `.dbf`: the file that stores the attributes in a tabular format.
+* **`.shp`:** the file that contains the geometry for all features.
+* **`.shx`:** the file that indexes the geometry.
+* **`.dbf`:** the file that stores feature attributes in a tabular format.
 
-Those files all need to have the **same name** and to be stored in the same
+
+These files need to have the **same name** and to be stored in the same
 directory (folder) to open properly in a GIS, `R` or `Python` tool.
 
 Sometimes, a shapefile will have other associated files including:
@@ -206,7 +267,7 @@ describing the projection using well-known text (WKT) format.
 * `.shp.xml`: the file that is the geospatial metadata in XML format, (e.g.
 ISO 19115 or XML format).
 
-## Shapefile Data Management - Sharing Vector Data
+## Data Management - Sharing Shapefiles
 
 When you work with a shapefile, you must keep all of the key associated
 file types together. And when you share a shapefile with a colleague, it is
@@ -222,8 +283,9 @@ The shapefile format is one (very common) way to store vector data. However,
 you may encounter is in other formats. For example, sometimes, point data are
 stored as a Comma Separated Value (.CSV) format. 
 
-We cover working with vector points in .csv format in the 
-[*Convert from .csv to a Shapefile in R* tutorial](http://neondataskills.org/R/csv-to-shapefile-R/).
+
+We cover working with vector points in .csv format in the
+[tutorial: Convert from .csv to a Shapefile in R.](http://neondataskills.org/Vector 04: Convert from .csv to a Shapefile in R).
 
 ## Raster Data
 
@@ -246,6 +308,18 @@ There are many different raster data file formats. In this tutorial series, we
 will focus on the `GeoTIFF`. The `GeoTIFF` format is similar to the `.tif` 
 format, however the `GeoTIFF` format stores additional spatial `metadata`. 
 
+```{r import-tif }
+# view attributes for a geotif file
+GDALinfo("NEON-DS-Airborne-Remote-Sensing/HARV/CHM/HARV_chmCrop.tif")
+
+# import geotiff
+chm_HARV <- raster("NEON-DS-Airborne-Remote-Sensing/HARV/CHM/HARV_chmCrop.tif")
+
+chm_HARV
+
+```
+
+
 ### Metadata in .tif Files
 
 The `tif` and `GeoTIFF` formats stores `metadata` as embedded `tif tags`. These
@@ -255,6 +329,10 @@ tags can include the following raster metadata:
 2. Spatial Extent (`extent`)
 3. Values for when no data is provided (`NoData Value`)
 4. The `resolution` of the data
+
+
+We will explore metadata in tif files in the next, tutorial - 
+[Spatial Intro 03: Data About Data -- Intro to Metadata File Formats and Structure]({{ site.baseurl }}R/metadata-file-formats-structures)
 
 IMPORTANT: just because a `.tif` file can store metadata tags, doesn't mean 
 that metadata are always included! If the data creator doesn't actively add
@@ -270,8 +348,8 @@ read incorrectly in other programs!
 
 ```{r na-value-tiff, eval=FALSE}
 
-#if you want a NA value of -9999, then you have to specify this when you
-#export a raster file in R
+# if you want a NA value of -9999, then you have to specify this when you
+# export a raster file in R
 exampleRaster <- writeRaster(rasterObject,  # object to export/write
                              FileName.tif,  # name of new .tif file
                              datatype = "INT1U",  # the data type
@@ -289,8 +367,15 @@ the date the photo was taken.
 {: .notice}
 
 ### Other Raster File Formats
+
 * **.asc:** A comma separated text file with a spatial heading.
 * **Hierarchical Data Format (HDF5):** An open file format that supports large,
 complex, heterogensous data. More on HDF5 formated rasters can be found in the
 NEON Data Skills [tutorials focusing on HDF5](http://neondataskills.org/HDF5/). 
 * **.grd:** An ESRI specific raster format.
+* **netCDF:**  
+    + <a href="http://www.unidata.ucar.edu/software/netcdf/docs/faq.html" target="_blank">About netCDF (UCAR)</a>
+    + <a href="https://publicwiki.deltares.nl/display/OET/Creating+a+netCDF+file+with+R" target="_blank">Create netCDF in R</a>
+    + <a href="http://geog.uoregon.edu/bartlein/courses/geog607/Rmd/netCDF_01.htm" target="_blank">A tutorial for version 3 in R</a>
+* **GRIB:** <a href="http://luckgrib.com/tutorials/2015/07/23/what-is-grib.html" target="_blank">What is Grib?</a>
+

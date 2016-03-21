@@ -12,10 +12,9 @@ tags: [R, spatial-data-gis]
 mainTag: spatial-data-management-series
 workshopSeries: [spatial-data-management-series]
 description: "This tutorial provides an overview of finding spatial data to 
-support one's research question. It covers some of the key data sources and 
-providers and places that one can look to find data for a study area or research
-question."
-code1: 00-spatio-temporal-science-questions.R
+support a research question. It covers some of the key data sources, 
+providers and places that one can use to find data."
+code1: /R/dc-spatio-temporal-intro/00-spatio-temporal-science-questions.R
 image:
   feature: NEONCarpentryHeader_2.png
   credit: A collaboration between the National Ecological Observatory Network (NEON) and Data Carpentry
@@ -27,12 +26,12 @@ comments: true
 {% include _toc.html %}
 
 This tutorial provides an overview of finding spatial data to support your 
-research question. It covers some of the key data sources and providers and 
+research question. It covers some of the key data sources, providers and 
 places that you can look to find data for your study are / research question.
 
-**R Skill Level:** None. This tutorial is in a series with data skills
-intensive tutorials in the `R` programming language, however, the conceptual
-topics presented here relate to all programming languages! 
+**Skill Level:** This tutorial provides conceptual background for the NEON / Data Carpentry 
+spatio-temporal tutorial series. The concepts outlined int his tutorial, relate to many other
+programming languages and data types! 
 
 <div id="objectives" markdown="1">
 
@@ -65,6 +64,7 @@ answer a spatio-temporal research question.
 </figure>
 
 ## Answer Scientific Questions Using Data 
+
 We often begin a research project with one or more questions that we would like 
 to answer. Once we have a question, we identify the:
 
@@ -78,6 +78,7 @@ Once we have identified these things, we can determine what methods are
 needed to collect data needed to answer our question.
 
 ## Work With External Data
+
 When our question requires data that are small in temporal and/or spatial scale, 
 we can often collect the data needed to answer the question ourselves. When we
 ask questions that cover larger spatial (e.g. regions to continents) and 
@@ -86,6 +87,7 @@ organizations, and agencies. We refer to these data as **external data** - data
 that we have not collected ourselves. 
 
 ## Metadata - Data That Describe the Data
+
 When working with external data, we need to understand metadata - the 
 documentation associated with a dataset that helps us understand collection and 
 processing methods, format and other key information including:
@@ -126,10 +128,10 @@ Both sites are mapped below:
 
 ```{r field-site-map, include=TRUE, echo=FALSE, results="hide", message =FALSE, warning=FALSE}
 
-# please create a map that shows the location of BOTH field sites.
+# create a map that shows the location of BOTH field sites.
 # add a legend with a point for each site. 
 library(rgdal)
-# Read the .csv file
+# Read the Shapefile
 State.Boundary.US <- readOGR("NEON-DS-Site-Layout-Files/US-Boundary-Layers",
           "US-State-Boundaries-Census-2014")
 
@@ -173,7 +175,7 @@ differences in the timing of greening and browning of plants (phenophase timing)
 between the two sites? If there are differences, what is causing them? Do the 
 two sites have the same drivers (causes) of phenologic change. 
 
-### Science Goals in the Work with Spatio-temporal Data in R Series
+### Science Goals - Spatio-temporal Data in R Series
 
 In the 
 [Work with Spatio-temporal Data in R series](http://neondataskills.org/tutorial-series/neon-dc-phenology-series/),
@@ -188,10 +190,10 @@ achieve this goal we need data that:
 sites that are located 3,000+ miles apart!
 
 <figure>
-	<a href="https://xxxx">
-	<img src="https://xxxx"></a>
-	<figcaption> TO BE ADDED NDVI PLOT FROM VIDEO. 
-	On a plot of NDVI (Normalized Difference Vegetative Index) we can see when the
+	<a href="{{ site.baseurl }}/images/dc-spatio-temporal-intro/NDVI_Plot.png">
+	<img src="{{ site.baseurl }}/images/dc-spatio-temporal-intro/NDVI_Plot.png"></a>
+	<figcaption> 
+	An example plot of NDVI (Normalized Difference Vegetative Index). We see when the
 	vegetation is greener (a larger value) throughout a year or a growing season. 
 	Source: National Ecological Observatory Network (NEON)  
 	</figcaption>
@@ -200,10 +202,13 @@ sites that are located 3,000+ miles apart!
 <div id="challenge" markdown="1">
 ## Challenge: Components of a Large Research Question
 
-What are some potential sources of data that might be useful to
-address our phenology question? How would you go about finding these
-data?
+Consider the following questions: 
 
+1. What are some potential sources of data that might be useful to
+address our phenology question? 
+2. How would you go about finding these data?
+
+If you have a colleague nearby, discuss it with them!
 </div>
 
 ```{r sources-of-data, echo=FALSE}
@@ -217,10 +222,10 @@ data?
 
 ```
 
-## Components of Our Project
+## Project Components
 
 One way to tackle our research project, is to break it down into smaller pieces.
-We can identify that types of data that we might need. We'd like to do the 
+We can  first identify that types of data that we need. We'd like to do the 
 following:
 
 * **Map / plot phenophase timing at both sites:** We will need data that 
@@ -229,7 +234,7 @@ process it to plot greenness at both sites?
 * **Understand our field sites:** To understand our sites we will need data that 
 "map" vegetation cover and show road locations and boundaries. We also might want to create a map of our study 
 sites for a future publication.
-	+ How big are the sites?
+	+ How large (spatial extent) are the sites?
 	+ How dense is the vegetation? 
 	+ Where are the field sites located? 
 	+ Are the sites accessible by roads or difficult to get to?  
@@ -251,7 +256,8 @@ greening and browning of entire forests or grasslands at multiple sites. To
 answer our specific question at a regional scale, we need data that can measure
 these events over larger areas.
 
-#### Measuring Phenology at Different Scales
+#### Phenology at Different Scales
+
 <iframe width="560" height="315" src="https://www.youtube.com/embed/_4uHLXL1yZA" frameborder="0" allowfullscreen></iframe>
 
 
@@ -267,8 +273,9 @@ space, they cover a larger area. The data are standardized, collected using
 the same "camera", so the data can be easily compared across sites and through
 time. 
 
-#### Mapping the Invisible: Introduction to Spectral Remote Sensing
-This video explains more about how high fidelity remote sensing cameras work.
+#### Introduction to Spectral Remote Sensing
+
+This video explains how remote sensing cameras (spectral sensors) work.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/3iaFzafWJQE" frameborder="0" allowfullscreen></iframe> 
 
@@ -341,11 +348,17 @@ Other, non-USGS sources of remote sensing data can be found in the
 
 Visit the 
 <a href="http://landsatlook.usgs.gov/" target="_blank">Landsat Look Viewer website</a>.
-Search for any location of interest. Can decide? Try one of our study sites: 
+Search for any location of interest. One option could be a NEON Field site: 
 Harvard Forest, Massachusetts, United States. 
 
-1. Data from which Landsat sensors are available for your area? 
-2. How is the quality of the images?
+Then answer the following questions:
+
+1. Are data Landsat sensors are available for the area? If so, what Landsat sensors do the data
+come from? 
+2. Is there cloud cover in any of the images?
+3. What time period are the data available for?
+
+Discuss with a colleague if you are working on this in a workshop!
 </div>
 
 ```{r explore-landsat-data, echo=FALSE}
@@ -359,14 +372,22 @@ Harvard Forest, Massachusetts, United States.
 ### Work With Remote Sensing Imagery - Raster Data Format 
 
 Remote sensing images are in **raster** format. They are composed of pixels -
-just like the pixels in the images we take with our camera phones. We will 
-learn more about the raster format in 
-[Spatial Data Formats -- Intro to Shapefiles (Vector Data) and GeoTiffs (Raster Data)]({{ site.baseurl }}/R/spatial-data-formats)
+just like the pixels in the images we take with our camera phones. Because we are studying 
+phenophase timing, we need raster data collected 
+repeatedly through time to identify when groups of plants green-up and brown down.
+We can use the <a href="https://cran.r-project.org/web/packages/rasterVis/index.html" target="_blank"> `rasterVis` package in `R` </a> efficiently plot raster time
+series.
 
-We teach how to work with raster data in the NEON Data Skills
-[*Introduction to Working With Raster Data in R* tutorial series]({{ http://neondataskills.org/tutorial-series/raster-data-series/).
-And, specifically for working with raster time series data, in the 
-[*Working With Raster Time Series Data in R* tutorial series]({{ http://neondataskills.org/tutorial-series/raster-time-series/).
+
+We will 
+learn more about the raster format in 
+[Spatial Data Formats -- Intro to Shapefiles (Vector Data) and GeoTiffs (Raster Data)](http://neondataskills.org/R/spatial-data-formats)
+
+We will learn how to work with raster data in the NEON Data Skills
+[*Introduction to Working With Raster Data in R* tutorial series](http://neondataskills.org/tutorial-series/raster-data-series/).
+And, about raster time series data, in the 
+[*Work With Raster Time Series Data in R* tutorial series](http://neondataskills.org/tutorial-series/raster-time-series/).
+
 
 ## Find Temperature and Precipitation Data
 
@@ -375,13 +396,14 @@ green-up and brown-down phenophase stages -
 temperature (both air & soil temperature), photosynthetically active radiation, 
 and precipitation. 
 
-These *micrometeorological* measurements are recorded at weather stations across 
+Precipitation, temperature and other *micrometeorological* measurements are recorded at 
+weather stations across 
 the globe. Many research and long term monitoring stations have towers with 
 sensors mounted on them that collect high frequency (many measurements a second 
 or minute) measurements of variables including temperature, precipitation, light 
 intensity, wind speed and more.
 
-Some sources of climatic data include:
+Some sources of climate data:
 
 * <a href="http://www.neonscience.org/science-design/collection-methods/flux-tower-measurements" target="_blank"> **National Ecological Observatory Network (NEON):** </a>
 data from a network of have flux towers, that measure temperature, 
@@ -411,7 +433,7 @@ Many LTER sites have micrometerology towers that collect climatic data.
 
 ### Climate Data At Our Field Sites
 
-If we want climatic data for our field sites, there are several places that 
+If we want climate data for our field sites, there are several places that 
 we can start. In our case, 
 <a href="http://harvardforest.fas.harvard.edu/research/LTER/" target="_blank">Harvard Forest is a LTER site </a>,
 so we can hope for a micrometerology tower that contains temperature and 
@@ -421,6 +443,11 @@ Visiting the
 we learn that it has a meteorological station / flux tower that has been
 collecting data since 2001. Better yet, the data are freely available for
 download from the <a href="http://harvardforest.fas.harvard.edu/harvard-forest-data-archive" target="_blank"> Harvard Forest data archives</a>. 
+
+<i class="fa fa-star"></i> **Data Note:** Also take note that there are some other data 
+resources on this page including "GIS" data. Many research stations (not all) 
+have these types of data available.
+{: .notice}
 
 #### Micro-meteorological Data from the Fisher Tower
 The 
@@ -443,7 +470,8 @@ available at 15-minute and daily intervals.
 </figure>   
 
 ### Work With Time Series Data in R
-The micrometeorolgical data are available for download in text of Comma
+
+The climate data are available for download in a Comma
 Separated Value (`.csv`) format. To work with these data in `R`, we will need 
 to understand how to work with date and time formats. 
 
@@ -471,9 +499,10 @@ Revisiting the <a href="http://harvardforest.fas.harvard.edu/data-archives" targ
 
 ```
 
-## Find Data to Characterize our Study Site
+## Data to Characterize our Study Site
 
-It is often useful to create maps that characterize our field sites. Maps are integral to planning site visits and plot locations prior to visiting.These maps
+It is often useful to create maps that characterize our field sites. Maps are integral to 
+planning site visits and plot locations prior to visiting. Maps
 are useful tools to get to know a site's:
 
 * Layout including roads, and other infrastructure.
@@ -481,7 +510,7 @@ are useful tools to get to know a site's:
 * Vegetation height and cover
 
 They are also essential for understanding sites that we may study using external
-data but never be able to vist because they are too far away or visitation is 
+data but never visit because they are far away or access is 
 restricted. Maps are also useful for publications to describe our field sites.
 
 ### Map Site Infrastructure: Buildings, Roads, Streams

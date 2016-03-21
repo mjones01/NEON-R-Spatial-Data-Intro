@@ -6,7 +6,7 @@ date: 2015-10-26
 authors: [Leah A. Wasser, Megan A. Jones]
 contributors: [ ]
 dateCreated: 2015-10-23
-lastModified: 2016-03-01
+lastModified: 2016-03-11
 packagesLibraries: [ ]
 category: [self-paced-tutorial] 
 tags: [R, spatial-data-gis]
@@ -14,7 +14,7 @@ mainTag: spatial-data-management-series
 workshopSeries: [spatial-data-management-series]
 description: "This lesson covers the key spatial attributes that are needed to work with 
 spatial data including: Coordinate Reference Systems (CRS), Extent and spatial resolution."
-code1: 04-intro-CRS-projection.R
+code1: /R/dc-spatio-temporal-intro/04-intro-CRS-projection.R
 image:
   feature: NEONCarpentryHeader_2.png
   credit: A collaboration between the National Ecological Observatory Network (NEON) and Data Carpentry
@@ -59,8 +59,11 @@ preferably, `RStudio` loaded on your computer.
 
 If you want to follow along, please download 
 
-<a href="http://www.naturalearthdata.com/downloads/110m-physical-vectors/110m-land/" class="btn btn-success">
-Download Natural Earth Global Boundary Layer</a>
+<a href="http://www.naturalearthdata.com/downloads/110m-physical-vectors/110m-land/" target="_blank"  class="btn btn-success">
+Download "land" - Natural Earth Global Continent Boundary Layer</a>
+
+<a href="http://www.naturalearthdata.com/downloads/110m-physical-vectors/110m-graticules/" target="_blank" class="btn btn-success">
+Download all Graticules - Natural Earth Global Graticules Layer</a>
 
 ****
 
@@ -184,14 +187,10 @@ the central meridian on the globe (0,0).
     library(rgdal)
     library(ggplot2)
     library(rgeos)
-
-    ## rgeos version: 0.3-11, (SVN revision 479)
-    ##  GEOS runtime version: 3.4.2-CAPI-1.8.2 r3921 
-    ##  Linking to sp version: 1.1-0 
-    ##  Polygon checking: TRUE
-
     library(raster)
-    setwd("~/Documents/data")
+    
+    # be sure to set your working directory
+    # setwd("~/Documents/data")
     
     # read shapefile
     worldBound <- readOGR(dsn="Global/Boundaries/ne_110m_land", 
@@ -222,7 +221,7 @@ We can add three coordinate locations to our map. Note that the UNITS are
 in decimal **degrees** (latitude, longitude):
 
 * Boulder, Colorado:  40.0274, -105.2519
-* Oslo, Norway: 50.9500, 10.7500
+* Oslo, Norway: 59.9500, 10.7500
 * Mallorca, Spain: 39.6167, 2.9833
 
 Let's create a second map with the locations overlayed on top of the continental
@@ -230,15 +229,17 @@ boundary layer.
 
 
     # define locations of Boulder, CO and Oslo, Norway
-    loc <- data.frame(lon=c(-105.2519, 10.7500, 2.9833),
-                    lat=c(40.0274, 50.9500, 39.6167))
+    # store them in a data.frame format
+    loc.df <- data.frame(lon=c(-105.2519, 10.7500, 2.9833),
+                    lat=c(40.0274, 59.9500, 39.6167))
     
-    # convert to dataframe
-    loc.df <- fortify(loc)  
+    # only needed if the above is a spatial points object
+    # loc.df <- fortify(loc)  
     
     # add a point to the map
     mapLocations <- worldMap + geom_point(data=loc.df, 
-                          aes(x=lon, y=lat, group=NULL, colour = "purple"),
+                            aes(x=lon, y=lat, group=NULL),
+                          colour = "springgreen",
                           size=5)
     
     mapLocations + theme(legend.position="none")
@@ -299,7 +300,8 @@ we used above, to our map, with the `CRS` of `Robinsons`?
 
     # add a point to the map
     newMap <- robMap + geom_point(data=loc.df, 
-                          aes(x=lon, y=lat, group=NULL, colour = "purple"),
+                          aes(x=lon, y=lat, group=NULL),
+                          colour = "springgreen",
                           size=5)
     
     newMap + theme(legend.position="none")
@@ -313,32 +315,32 @@ to as **reprojection** but performed by the `spTransform()` function in `R`.
 
 
     # define locations of Boulder, CO and Oslo, Norway
-    loc 
+    loc.df
 
     ##         lon     lat
     ## 1 -105.2519 40.0274
-    ## 2   10.7500 50.9500
+    ## 2   10.7500 59.9500
     ## 3    2.9833 39.6167
 
     # convert to spatial Points data frame
-    loc.spdf <- SpatialPointsDataFrame(coords = loc,data=loc,
+    loc.spdf <- SpatialPointsDataFrame(coords = loc.df, data=loc.df,
                                 proj4string=crs(worldBound))  
     
     loc.spdf
 
     ## class       : SpatialPointsDataFrame 
     ## features    : 3 
-    ## extent      : -105.2519, 10.75, 39.6167, 50.95  (xmin, xmax, ymin, ymax)
+    ## extent      : -105.2519, 10.75, 39.6167, 59.95  (xmin, xmax, ymin, ymax)
     ## coord. ref. : +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 
     ## variables   : 2
     ## names       :       lon,     lat 
     ## min values  : -105.2519, 39.6167 
-    ## max values  :     10.75,   50.95
+    ## max values  :     10.75,   59.95
 
     # reproject data to Robinson
     loc.spdf.rob <- spTransform(loc.spdf, CRSobj = CRS("+proj=robin"))
     
-    loc.rob.df <- as.data.frame(cbind(loc.spdf.rob$lon,loc.spdf.rob$lat))
+    loc.rob.df <- as.data.frame(cbind(loc.spdf.rob$lon, loc.spdf.rob$lat))
     # rename each column
     names(loc.rob.df ) <- c("X","Y")
     
@@ -351,12 +353,13 @@ to as **reprojection** but performed by the `spTransform()` function in `R`.
 
     ##            X       Y
     ## 1 -9162993.5 4279263
-    ## 2   875481.0 5424980
+    ## 2   811462.5 6331141
     ## 3   260256.6 4235608
 
     # add a point to the map
     newMap <- robMap + geom_point(data=loc.rob, 
-                          aes(x=X, y=Y, group=NULL, colour = "purple"),
+                          aes(x=X, y=Y, group=NULL),
+                          colour = "springgreen",
                           size=5)
     
     newMap + theme(legend.position="none")
@@ -372,9 +375,6 @@ or latitude and longitude lines rendered on the map.
 NOTE: The code for this map can
 be found in the .R document that is available for download at the bottom of this 
 page!
-
-
-    ## Error in eval(expr, envir, enclos): object 'latlongMap' not found
 
 ![ ]({{ site.baseurl }}/images/rfigs/dc-spatio-temporal-intro/04-intro-CRS-projection/plot-w-graticules-1.png)
 

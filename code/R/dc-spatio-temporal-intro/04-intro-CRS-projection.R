@@ -4,7 +4,9 @@ library(rgdal)
 library(ggplot2)
 library(rgeos)
 library(raster)
-setwd("~/Documents/data")
+
+# be sure to set your working directory
+# setwd("~/Documents/data")
 
 # read shapefile
 worldBound <- readOGR(dsn="Global/Boundaries/ne_110m_land", 
@@ -26,15 +28,17 @@ worldMap
 ## ----add-lat-long-locations----------------------------------------------
 
 # define locations of Boulder, CO and Oslo, Norway
-loc <- data.frame(lon=c(-105.2519, 10.7500, 2.9833),
-                lat=c(40.0274, 50.9500, 39.6167))
+# store them in a data.frame format
+loc.df <- data.frame(lon=c(-105.2519, 10.7500, 2.9833),
+                lat=c(40.0274, 59.9500, 39.6167))
 
-# convert to dataframe
-loc.df <- fortify(loc)  
+# only needed if the above is a spatial points object
+# loc.df <- fortify(loc)  
 
 # add a point to the map
 mapLocations <- worldMap + geom_point(data=loc.df, 
-                      aes(x=lon, y=lat, group=NULL, colour = "purple"),
+                        aes(x=lon, y=lat, group=NULL),
+                      colour = "springgreen",
                       size=5)
 
 mapLocations + theme(legend.position="none")
@@ -63,7 +67,8 @@ robMap
 
 # add a point to the map
 newMap <- robMap + geom_point(data=loc.df, 
-                      aes(x=lon, y=lat, group=NULL, colour = "purple"),
+                      aes(x=lon, y=lat, group=NULL),
+                      colour = "springgreen",
                       size=5)
 
 newMap + theme(legend.position="none")
@@ -72,17 +77,17 @@ newMap + theme(legend.position="none")
 ## ----reproject-robinson--------------------------------------------------
 
 # define locations of Boulder, CO and Oslo, Norway
-loc 
+loc.df
 
 # convert to spatial Points data frame
-loc.spdf <- SpatialPointsDataFrame(coords = loc,data=loc,
+loc.spdf <- SpatialPointsDataFrame(coords = loc.df, data=loc.df,
                             proj4string=crs(worldBound))  
 
 loc.spdf
 # reproject data to Robinson
 loc.spdf.rob <- spTransform(loc.spdf, CRSobj = CRS("+proj=robin"))
 
-loc.rob.df <- as.data.frame(cbind(loc.spdf.rob$lon,loc.spdf.rob$lat))
+loc.rob.df <- as.data.frame(cbind(loc.spdf.rob$lon, loc.spdf.rob$lat))
 # rename each column
 names(loc.rob.df ) <- c("X","Y")
 
@@ -94,13 +99,14 @@ loc.rob <- fortify(loc.rob.df)
 loc.rob
 # add a point to the map
 newMap <- robMap + geom_point(data=loc.rob, 
-                      aes(x=X, y=Y, group=NULL, colour = "purple"),
+                      aes(x=X, y=Y, group=NULL),
+                      colour = "springgreen",
                       size=5)
 
 newMap + theme(legend.position="none")
 
 
-## ----plot-w-graticules, echo=FALSE, message=FALSE, warning=FALSE---------
+## ----plot-w-graticules, echo=FALSE, message=FALSE, warning=FALSE, results='hide'----
 #this is not taught in the lesson but use it to display ggplot next to each other
 require(gridExtra)
 
@@ -117,6 +123,7 @@ newTheme <- list(theme(line = element_blank(),
 ## add graticules
 graticule <- readOGR("Global/Boundaries/ne_110m_graticules_all", 
                      layer="ne_110m_graticules_15") 
+# convert spatial object into a ggplot ready, data.frame
 graticule_df <- fortify(graticule)
 
 bbox <- readOGR("Global/Boundaries/ne_110m_graticules_all", layer="ne_110m_wgs84_bounding_box") 
@@ -131,8 +138,9 @@ latLongMap <- ggplot(bbox_df, aes(long,lat, group=group)) +
   coord_equal() + newTheme +
   scale_fill_manual(values=c("black", "white"), guide="none") # change colors & remove legend
 
-latLongMap <- latlongMap + geom_point(data=loc.df, 
-                      aes(x=lon, y=lat, group=NULL, colour = "purple"),
+latLongMap <- latLongMap + geom_point(data=loc.df, 
+                      aes(x=lon, y=lat, group=NULL),
+                      colour="springgreen",
                       size=5)
 
 # reproject grat into robinson
@@ -153,7 +161,8 @@ finalRobMap <- ggplot(bbox_robin_df, aes(long,lat, group=group)) +
 
 # add a point to the map
 finalRobMap <- finalRobMap + geom_point(data=loc.rob, 
-                      aes(x=X, y=Y, group=NULL, colour = "purple"),
+                      aes(x=X, y=Y, group=NULL),
+                      colour="springgreen",
                       size=5)
 
 
